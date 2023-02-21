@@ -89,7 +89,7 @@
 			></i>
 		</div>
 		<!-- 员工信息 -->
-		<el-dropdown :show-timeout="70" :hide-timeout="50">
+		<el-dropdown :show-timeout="70" :hide-timeout="50" @command="onDropdownClick">
 			<span class="layout-navbars-breadcrumb-user-link">
 				<img
 					:src="userInfo.userInfos.photo"
@@ -100,12 +100,14 @@
 				<i class="el-icon-arrow-down el-icon--right"></i>
 			</span>
 			<el-dropdown-menu slot="dropdown">
-				<el-dropdown-item>{{ $t('message.user.dropdown1') }}</el-dropdown-item>
-				<el-dropdown-item>{{ $t('message.user.dropdown6') }}</el-dropdown-item>
-				<el-dropdown-item>{{ $t('message.user.dropdown2') }}</el-dropdown-item>
-				<el-dropdown-item>{{ $t('message.user.dropdown3') }}</el-dropdown-item>
-				<el-dropdown-item>{{ $t('message.user.dropdown4') }}</el-dropdown-item>
-				<el-dropdown-item>{{ $t('message.user.dropdown5') }}</el-dropdown-item>
+				<el-dropdown-item command="/home">{{ $t('message.user.dropdown1') }}</el-dropdown-item>
+				<el-dropdown-item command="wareHouse">{{ $t('message.user.dropdown6') }}</el-dropdown-item>
+				<el-dropdown-item command="/personal">{{ $t('message.user.dropdown2') }}</el-dropdown-item>
+				<el-dropdown-item command="/404">{{ $t('message.user.dropdown3') }}</el-dropdown-item>
+				<el-dropdown-item command="/401">{{ $t('message.user.dropdown4') }}</el-dropdown-item>
+				<el-dropdown-item divided command="logOut">{{
+					$t('message.user.dropdown5')
+				}}</el-dropdown-item>
 			</el-dropdown-menu>
 		</el-dropdown>
 		<Search ref="searchRef" />
@@ -114,7 +116,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { Local } from '@/utils/storage.js';
+import { Local, Session } from '@/utils/storage.js';
 import screenfull from 'screenfull';
 import UserNews from './userNews.vue';
 import Search from './search.vue';
@@ -241,6 +243,52 @@ export default {
 		// 布局配置
 		onLayoutSetingClick() {
 			this.bus.$emit('openSetingsDrawer');
+		},
+
+		// 下拉菜单 当前点击
+		onDropdownClick(path) {
+			if (path === 'logOut') {
+				this.logOut();
+			} else if (path === 'wareHouse') {
+				window.open('https://github.com/shaotian-li/vue2-saas-admin');
+			} else {
+				this.$router.push(path);
+			}
+		},
+
+		// 退出登陆
+		logOut() {
+			setTimeout(() => {
+				this.$msgbox({
+					closeOnClickModal: false,
+					closeOnPressEscape: false,
+					title: this.$t('message.user.logOutTitle'),
+					message: this.$t('message.user.logOutMessage'),
+					showCancelButton: true,
+					confirmButtonText: this.$t('message.user.logOutConfirm'),
+					cancelButtonText: this.$t('message.user.logOutCancel'),
+					beforeClose: (action, instance, done) => {
+						if (action === 'confirm') {
+							instance.confirmButtonLoading = true;
+							instance.confirmButtonText = this.$t('message.user.logOutExit');
+							setTimeout(() => {
+								done();
+								setTimeout(() => {
+									instance.confirmButtonLoading = false;
+								}, 300);
+							}, 700);
+						} else {
+							done();
+						}
+					},
+				})
+					.then(() => {
+						// 清除缓存
+						Session.clear();
+						window.location.reload();
+					})
+					.catch(() => {});
+			}, 300);
 		},
 	},
 };

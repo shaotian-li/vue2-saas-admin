@@ -10,7 +10,6 @@ import setIntroduction from '@/utils/setIconfont.js';
 import Setings from '@/layout/navBars/breadcrumb/setings.vue';
 import { Local } from '@/utils/storage.js';
 import { mapState, mapActions } from 'vuex';
-// openSetingsDrawer
 export default {
 	name: 'App',
 

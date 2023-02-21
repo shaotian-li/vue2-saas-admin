@@ -183,7 +183,7 @@ export default {
 				this.$store.dispatch('userInfo/setUserInfos', userInfos);
 				PrevLoading.start();
 				this.$router.push('/');
-				PrevLoading.start();
+				// PrevLoading.start();
 			}, 300);
 		},
 	},
